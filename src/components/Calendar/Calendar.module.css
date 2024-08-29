@@ -1,0 +1,63 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 25%;
+    white-space: nowrap;
+}
+
+.button {
+    background-color: gray;
+    color: white;
+    width: 35px;
+}
+
+.days {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 0;
+}
+
+.day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    margin-right: 13px;
+}
+
+.calendar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.squares {
+    display: flex;
+}
+
+.square {
+    background-color: green;
+    height: 15px;
+    width: 15px;
+    border-radius: 4px;
+    margin-right: 10px;
+}

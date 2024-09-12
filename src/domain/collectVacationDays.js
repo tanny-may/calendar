@@ -1,32 +1,33 @@
 import { makeDays } from './makeDays';
 
 export function collectVacationDays(vacations) {
-	let res = {};
+	const res = {};
 
-	for (let el of vacations) {
-		let [start, end] = el;
-		let startArr = start.split('.').map(Number);
-		let [dayStart, monthStart, yearStart] = startArr;
-		let endArr = end.split('.').map(Number);
-		let [dayEnd, monthEnd, yearEnd] = endArr;
+	for (const [start, end] of vacations) {
+		const [dayStart, monthStart, yearStart] = start.split('.').map(Number);
+		const [dayEnd, monthEnd, yearEnd] = end.split('.').map(Number);
+
+		let currentDay = dayStart;
+		let currentMonth = monthStart;
+		let currentYear = yearStart;
 
 		while (
-			yearStart < yearEnd ||
-			(yearStart === yearEnd && monthStart < monthEnd) ||
-			(yearStart === yearEnd && monthStart === monthEnd && dayStart <= dayEnd)
+			currentYear < yearEnd ||
+			(currentYear === yearEnd && currentMonth < monthEnd) ||
+			(currentYear === yearEnd && currentMonth === monthEnd && currentDay <= dayEnd)
 		) {
-			let key = String(monthStart).padStart(2, '0') + '.' + yearStart;
+			let key = String(currentMonth).padStart(2, '0') + '.' + currentYear;
 			res[key] ??= new Set();
-			res[key].add(dayStart);
-			dayStart++;
+			res[key].add(currentDay);
+			currentDay++;
 
-			if (dayStart > makeDays(monthStart - 1, yearStart).length) {
-				dayStart = 1;
-				monthStart++;
+			if (currentDay > makeDays(currentMonth - 1, currentYear).length) {
+				currentDay = 1;
+				currentMonth++;
 			}
-			if (monthStart > 12) {
-				monthStart = 1;
-				yearStart++;
+			if (currentMonth > 12) {
+				currentMonth = 1;
+				currentYear++;
 			}
 		}
 	}

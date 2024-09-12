@@ -5,12 +5,8 @@ import s from './Calendar.module.css';
 import { useState } from 'react';
 import { makeDays } from '../../domain/makeDays';
 import { collectVacationDays } from '../../domain/collectVacationDays';
+import { findVacationDaysIntersection } from '../../domain/findVacationDaysIntersection';
 
-// стейт можно сделать локальным
-// и лучше один стейт { month, year }
-// сделать две функции: +1 месяц и -1 месяц
-// уже в самой функции что-то менять
-// написать тесты на что-нибудь, на само изменение
 let months = [
 	'January',
 	'February',
@@ -28,12 +24,12 @@ let months = [
 
 export function Calendar({ employees }) {
 	const [date, setDate] = useState({ month: 4, year: 2024 });
-	let currMonth = date.month;
-	let currYear = date.year;
 
 	const days = makeDays(date.month, date.year);
 
 	function nextMonth() {
+		let currMonth = date.month;
+		let currYear = date.year;
 		currMonth++;
 		if (currMonth >= months.length) {
 			currMonth = currMonth % months.length;
@@ -43,27 +39,35 @@ export function Calendar({ employees }) {
 	}
 
 	function prevMonth() {
-		currMonth--;
-		if (currMonth < 0) {
-			currMonth = months.length - 1;
-			currYear--;
-		}
-		setDate({ month: currMonth, year: currYear });
+		setDate((date) => {
+			let currMonth = date.month;
+			let currYear = date.year;
+			currMonth--;
+			if (currMonth < 0) {
+				currMonth = months.length - 1;
+				currYear--;
+			}
+			return { month: currMonth, year: currYear };
+		});
 	}
 
-	// function setDate(monthNumber, year) {
-	// 	if (monthNumber < 0) {
-	// 		monthNumber = months.length - 1;
-	// 		year--;
-	// 	} else if (monthNumber >= months.length) {
-	// 		monthNumber = monthNumber % months.length;
-	// 		year++;
-	// 	}
-	// 	setMonthNumber(monthNumber);
-	// 	setYear(year);
-	// }
-	let key = String(currMonth + 1).padStart(2, '0') + '.' + String(currYear).substring(2);
+	let key = String(date.month + 1).padStart(2, '0') + '.' + String(date.year).slice(2);
 
+	const vacationsDict = Object.fromEntries(
+		employees.map((employee) => {
+			return [employee.name, collectVacationDays(employee.vacations) ?? new Set()];
+		})
+	);
+
+	function getColor(vacations, key, day) {
+		if (findVacationDaysIntersection(vacationsDict, date.month + 1, date.year).has(day)) {
+			return 'red'
+		}
+		else if ((collectVacationDays(vacations)[key] || new Set()).has(day)) {
+			return 'gold'
+		}
+		return 'green'
+	}
 	return (
 		<div className={s.wrapper}>
 			<div className={s.header}>
@@ -71,7 +75,7 @@ export function Calendar({ employees }) {
 					←
 				</button>
 				<h3>
-					{months[currMonth]} {currYear}
+					{months[date.month]} {date.year}
 				</h3>
 				<button className={s.button} onClick={() => nextMonth()}>
 					→
@@ -95,11 +99,7 @@ export function Calendar({ employees }) {
 								<li
 									key={day}
 									className={s.square}
-									style={
-										(collectVacationDays(employee.vacations)[key] || new Set()).has(day)
-											? { backgroundColor: 'gold' }
-											: { backgroundColor: 'green' }
-									}
+									style={{ backgroundColor: getColor(employee.vacations, key, day) }}
 								></li>
 							))}
 						</ul>
